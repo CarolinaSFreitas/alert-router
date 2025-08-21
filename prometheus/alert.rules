@@ -1,0 +1,30 @@
+groups:
+- name: containers
+  rules:
+
+  - alert: app_memory_too_high
+    expr: sum by (name) (container_memory_usage_bytes{name=~"projeto3-app-1"}) > 16478208
+    for: 30s
+    labels:
+      severity: critical
+    annotations:
+      summary: "Uso de memória muito alto"
+      description: "O container {{ $labels.name }} está usando mais de 16MB de memória."
+
+  - alert: app_cpu_too_high
+    expr: sum by (name) (rate(container_cpu_usage_seconds_total{name=~"projeto3-app-1"}[1m])) > 0.8
+    for: 1m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Uso de CPU muito alto"
+      description: "O container {{ $labels.name }} está usando mais de 80% da CPU por mais de 1 minuto."
+
+  - alert: app_down
+    expr: absent(container_last_seen{name=~"projeto3-app-1"})
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Container fora do ar"
+      description: "O container {{ $labels.name }} não está sendo detectado há mais de 1 minuto."
